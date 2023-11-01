@@ -25,26 +25,24 @@ void UPuzzlePlatformGameInstance::Init()
     UE_LOG(LogTemp, Warning, TEXT("Init"));
 
     IOnlineSubsystem *Subsystem = IOnlineSubsystem::Get();
-    if (Subsystem == nullptr)
+
+    if(Subsystem != nullptr)
     {
+        UE_LOG(LogTemp, Warning, TEXT("Subsystem Found: %s"), *Subsystem->GetSubsystemName().ToString());
+        SessionInterface = Subsystem->GetSessionInterface();
+
+        if(SessionInterface.IsValid())
+        {
+            SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnCreateSessionComplete);
+            SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnDestroySessionComplete);
+            SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnFindSessionComplete);
+            SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnJoinSessionComplete);
+        } else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Session Interface"));
+        }
+    } else {
         UE_LOG(LogTemp, Warning, TEXT("No Subsystem found"));
-    }
-
-    SessionInterface = Subsystem->GetSessionInterface();
-
-    if (SessionInterface == nullptr)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("No Session Interface"));
-    }
-    else
-    {
-        SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnCreateSessionComplete);
-        SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnDestroySessionComplete);
-        SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnFindSessionComplete);
-        SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPuzzlePlatformGameInstance::OnJoinSessionComplete);
-
-        SessionSearch = MakeShareable(new FOnlineSessionSearch());
-        SessionSearch->bIsLanQuery = true;
     }
 };
 
@@ -66,7 +64,7 @@ void UPuzzlePlatformGameInstance::Host()
 }
 
 void UPuzzlePlatformGameInstance::CreateSessionThis()
-{
+{  
     if (SessionInterface)
     {
         FOnlineSessionSettings SessionSettings;
@@ -143,11 +141,6 @@ void UPuzzlePlatformGameInstance::OnFindSessionComplete(bool Success)
             UE_LOG(LogTemp, Warning, TEXT("Session #:%f, Session Id: %s"), i, *SearchResults[i].GetSessionIdStr());
         }
 
-        //     for(const FOnlineSessionSearchResult& SearchResult : SearchResults)
-        //     {
-        //         UE_LOG(LogTemp, Warning, TEXT("Session: %s"), SearchResult.GetSessionIdStr());
-        //     }
-
         UE_LOG(LogTemp, Warning, TEXT("Find Session Complete"));
     }
 }
@@ -155,9 +148,11 @@ void UPuzzlePlatformGameInstance::OnFindSessionComplete(bool Success)
 void UPuzzlePlatformGameInstance::PrintSessions()
 {
     //If SessionSearch Exists then Find Sessions
-    if (SessionSearch)
+    SessionSearch = MakeShareable(new FOnlineSessionSearch());
+
+    if (SessionSearch.IsValid())
     {
-        SessionSearch->MaxSearchResults = 100; //Steam Requirement
+        SessionSearch->MaxSearchResults = 9999; //Steam Requirement
         SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); //Steam Requirement
         UE_LOG(LogTemp, Warning, TEXT("Finding Sessions"));
         SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
