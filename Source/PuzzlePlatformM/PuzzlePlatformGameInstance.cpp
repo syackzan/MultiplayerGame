@@ -12,6 +12,7 @@
 
 
 const static FName SESSION_NAME = TEXT("My Session Game");
+const static FName SERVER_NAME_SETTINGS = TEXT("ServerName");
 
 UPuzzlePlatformGameInstance::UPuzzlePlatformGameInstance(const FObjectInitializer &ObjectInitializer)
 {
@@ -46,8 +47,9 @@ void UPuzzlePlatformGameInstance::Init()
     }
 };
 
-void UPuzzlePlatformGameInstance::Host()
+void UPuzzlePlatformGameInstance::Host(FString ServerName)
 {
+    DesiredServerName = ServerName;
 
     if (SessionInterface)
     {
@@ -68,12 +70,19 @@ void UPuzzlePlatformGameInstance::CreateSessionThis()
     if (SessionInterface)
     {
         FOnlineSessionSettings SessionSettings;
-        //SessionSettings.bIsLANMatch = true; //LAN Setting
-        SessionSettings.bIsLANMatch = false; //Steam Setting
+
+        //Subsystem will switch between STEAM and NULL - NULL is for testing purposes and requires a LAN connection
+        if(IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
+        {
+            SessionSettings.bIsLANMatch = true; //LAN Setting
+        } else {
+            SessionSettings.bIsLANMatch = false; //Steam Setting
+        };
         SessionSettings.NumPublicConnections = 2;
         SessionSettings.bShouldAdvertise = true;
         SessionSettings.bUsesPresence = true; //Steam Setting (Not required for LAN)
         SessionSettings.bUseLobbiesIfAvailable = true; //Steam Setting v>4.27 (Not required for LAN)
+        SessionSettings.Set(SERVER_NAME_SETTINGS, DesiredServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
         SessionInterface->CreateSession(0, SESSION_NAME, SessionSettings);
     }
@@ -101,7 +110,8 @@ void UPuzzlePlatformGameInstance::OnCreateSessionComplete(FName SessionName, boo
             UWorld *World = GetWorld();
             if (World)
             {
-                World->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+                //World->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
+                World->ServerTravel("/Game/ThirdPerson/Maps/MainLobby");
             }
         }
 
@@ -126,19 +136,31 @@ void UPuzzlePlatformGameInstance::OnFindSessionComplete(bool Success)
             return;
 
         //Store Sessions inside of a TArray for manipulation
-        TArray<FOnlineSessionSearchResult> SearchResults = SessionSearch->SearchResults;
-
-        // Call A Function From MainMenu Widget that stores a TArray<FOnlineSessionSearchResult> xxx
-        MainMenuWidget->SetListOfSessions(SearchResults);
-
-        if (SearchResults.Num() == 0)
+        TArray<FServerData> ServerNames;
+        for (const FOnlineSessionSearchResult&  SearchResult : SessionSearch->SearchResults)
         {
-            UE_LOG(LogTemp, Warning, TEXT("No Search Results Found"));
+            FServerData Data;
+            
+            Data.MaxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections;
+            //NumOpenPublicConnections Gives you open slots left, not players in game. This is why we are subtracting
+            Data.CurrentPlayers = Data.MaxPlayers - SearchResult.Session.NumOpenPublicConnections; 
+            Data.HostUserName = SearchResult.Session.OwningUserName;
+            FString ServerName;
+            if(SearchResult.Session.SessionSettings.Get(SERVER_NAME_SETTINGS, ServerName))
+            {
+                Data.Name = ServerName;
+            } else {
+                Data.Name = "Could not find Server name.";
+            }
+            ServerNames.Add(Data);
         }
 
-        for (int i = 0; i < SearchResults.Num(); i++)
+        // Call A Function From MainMenu Widget that stores a TArray<FOnlineSessionSearchResult> xxx
+        MainMenuWidget->SetListOfSessions(ServerNames);
+
+        if (ServerNames.Num() == 0)
         {
-            UE_LOG(LogTemp, Warning, TEXT("Session #:%f, Session Id: %s"), i, *SearchResults[i].GetSessionIdStr());
+            UE_LOG(LogTemp, Warning, TEXT("No Search Results Found"));
         }
 
         UE_LOG(LogTemp, Warning, TEXT("Find Session Complete"));

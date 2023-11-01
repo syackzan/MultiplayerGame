@@ -28,7 +28,7 @@ public:
 	//This is called a pure virtual function
 	//This has an "Empty" implementation
 	
-	virtual void Host() = 0;
+	virtual void Host(FString ServerName) = 0;
 
 	virtual void Join(uint32 Index) = 0;
 

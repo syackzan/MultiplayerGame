@@ -8,6 +8,7 @@
 #include "Components/ScrollBox.h"
 #include "OnlineSessionSettings.h"
 #include "Components/TextBlock.h"
+#include "Components/EditableText.h"
 #include "ServerRow.h"
 
 bool UMainMenu::Initialize()
@@ -20,7 +21,7 @@ bool UMainMenu::Initialize()
 
     if (Host)
     {
-        Host->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
+        Host->OnClicked.AddDynamic(this, &UMainMenu::OpenHostServerWidget);
     }
 
     if (Join)
@@ -36,6 +37,16 @@ bool UMainMenu::Initialize()
     if (Cancel)
     {
         Cancel->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenu);
+    }
+
+    if(HostBackToMenu){
+        HostBackToMenu->OnClicked.AddDynamic(this, &UMainMenu::BackToMainMenuFromHost);
+    }
+
+    if(StartServer)
+    {
+        //TODO:: Add button to create Server name in Create Session
+        StartServer->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
     }
 
     if (ExitGameButton)
@@ -95,13 +106,22 @@ void UMainMenu::SetUp()
 
 void UMainMenu::HostServer()
 {
-    UE_LOG(LogTemp, Warning, TEXT("From Host Server!"));
-
     if (MenuInterface)
     {
-        MenuInterface->Host();
+        FString ServerNameInString = UserServerNameText->GetText().ToString();
+        MenuInterface->Host(ServerNameInString);
     }
 };
+
+void UMainMenu::OpenHostServerWidget()
+{
+    UE_LOG(LogTemp, Warning, TEXT("From Host Server!"));
+
+    if (WidgetSwitcher1)
+    {
+        WidgetSwitcher1->SetActiveWidgetIndex(2);
+    }
+}
 
 void UMainMenu::JoinGame()
 {
@@ -123,11 +143,8 @@ void UMainMenu::SelectIndex(uint32 Index)
 }
 
 // This function is called from Game Interface
-void UMainMenu::SetListOfSessions(TArray<FOnlineSessionSearchResult> ListOfSessionsFromInstance)
+void UMainMenu::SetListOfSessions(TArray<FServerData> ListOfServers)
 {
-    // Set List of Sessions
-    TArray<FOnlineSessionSearchResult> ListOfSessions = ListOfSessionsFromInstance;
-
     UWorld *ThisWorld = this->GetWorld();
 
     if (ThisWorld == nullptr)
@@ -138,14 +155,21 @@ void UMainMenu::SetListOfSessions(TArray<FOnlineSessionSearchResult> ListOfSessi
 
     uint32 index = 0;
     // Create ServerRowWidget + Change Name of Text
-    for (int i = 0; i < ListOfSessions.Num(); i++)
+    for (int i = 0; i < ListOfServers.Num(); i++)
     {
         ServerRowWidget = CreateWidget<UServerRow>(ThisWorld, ServerRowWidgetClass);
         if (ServerRowWidget == nullptr)
             return;
         UE_LOG(LogTemp, Warning, TEXT("ServerWidgetCreated"));
 
-        ServerRowWidget->ServerID->SetText(FText::FromString(ListOfSessions[i].GetSessionIdStr())); 
+        ServerRowWidget->ServerID->SetText(FText::FromString(ListOfServers[i].Name)); 
+        ServerRowWidget->HostUserName->SetText(FText::FromString(ListOfServers[i].HostUserName));
+        //Can use the commented out lines of code instead of binding two separate widgets for CurrentPlayers and MaxPlayers!
+        //FString FractionText = FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayers, ServerData.MaxPlayers)
+        //ServerRowWidget->ConnectionFraction->SetText(FractionText);
+        ServerRowWidget->CurrentPlayers->SetText(FText::AsNumber(ListOfServers[i].CurrentPlayers));
+        ServerRowWidget->MaxPlayers->SetText(FText::AsNumber(ListOfServers[i].MaxPlayers));
+
         ServerRowWidget->Setup(this, index);
         index++;
         UE_LOG(LogTemp, Warning, TEXT("Set Text"));
@@ -200,6 +224,14 @@ void UMainMenu::BackToMainMenu()
         WidgetSwitcher1->SetActiveWidgetIndex(0);
     }
 }
+
+void UMainMenu::BackToMainMenuFromHost()
+{
+    if (WidgetSwitcher1)
+    {
+        WidgetSwitcher1->SetActiveWidgetIndex(0);
+    }
+};
 
 void UMainMenu::ExitGame()
 {

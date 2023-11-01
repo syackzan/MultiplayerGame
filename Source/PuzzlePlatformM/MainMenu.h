@@ -7,6 +7,18 @@
 #include "MenuInterface.h"
 #include "MainMenu.generated.h"
 
+USTRUCT()
+struct FServerData {
+
+	GENERATED_BODY()
+
+	FString Name;
+	uint16 CurrentPlayers;
+	uint16 MaxPlayers;
+	FString HostUserName;
+
+};
+
 /**
  * 
  */
@@ -23,7 +35,7 @@ public:
 
 	void SetMenuInterface(IMenuInterface* SpecificMenuInterface);
 
-	void SetListOfSessions(TArray<FOnlineSessionSearchResult> ListOfSessionsFromInstance);
+	void SetListOfSessions(TArray<FServerData> ListOfServers);
 
 	void SetUp();
 
@@ -44,6 +56,15 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Cancel;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* HostBackToMenu;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* StartServer;
+
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* UserServerNameText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ExitGameButton;
@@ -73,7 +94,13 @@ private:
 	void BackToMainMenu();
 
 	UFUNCTION()
+	void BackToMainMenuFromHost();
+
+	UFUNCTION()
 	void ExitGame();
+
+	UFUNCTION()
+	void OpenHostServerWidget();
 
 	TOptional<uint32> SelectedIndex;
 

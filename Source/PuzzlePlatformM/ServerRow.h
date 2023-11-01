@@ -28,6 +28,15 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* ServerID;
 
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* CurrentPlayers;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* MaxPlayers;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* HostUserName;
+
 	void Setup(class UMainMenu* InParent, uint32 InIndex);
 
 private:

@@ -24,10 +24,10 @@ public:
 	virtual void Init();
 
 	UFUNCTION(Exec)
-	void Host();
+	void Host(FString ServerName) override;
 
 	UFUNCTION(Exec)
-	void Join(uint32 Index);
+	void Join(uint32 Index) override;
 
 	UFUNCTION(Exec, BlueprintCallable) 
 	void LoadMenu();
@@ -66,5 +66,7 @@ private:
 	void CreateSessionThis();
 
 	TSharedPtr<class FOnlineSessionSearch> SessionSearch;
+
+	FString DesiredServerName = "";
 	
 };
