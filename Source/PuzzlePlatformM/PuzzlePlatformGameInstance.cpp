@@ -111,7 +111,7 @@ void UPuzzlePlatformGameInstance::OnCreateSessionComplete(FName SessionName, boo
             if (World)
             {
                 //World->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
-                World->ServerTravel("/Game/ThirdPerson/Maps/MainLobby");
+                World->ServerTravel("/Game/ThirdPerson/Maps/MainLobby?listen");
             }
         }
 
