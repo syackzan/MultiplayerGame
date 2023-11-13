@@ -8,6 +8,18 @@ public class PuzzlePlatformM : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "UMG", "OnlineSubsystem", "OnlineSubsystemSteam" });
+		PublicDependencyModuleNames.AddRange(new string[] { 
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"HeadMountedDisplay", 
+			"EnhancedInput", 
+			"UMG", 
+			"OnlineSubsystem", 
+			"OnlineSubsystemSteam", //Provides Online SusbsystemSteam
+			"OnlineSubsystemUtils", //Provides utils to acquire Steam Id
+			"Steamworks" //Provides utils to acquire Steam Id
+		});
 	}
 }

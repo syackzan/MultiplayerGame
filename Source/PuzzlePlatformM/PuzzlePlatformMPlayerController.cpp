@@ -3,10 +3,30 @@
 
 #include "PuzzlePlatformMPlayerController.h"
 #include "InGameMenu.h"
+#include "GameFramework/PlayerState.h"
+#include "BPFL_Steam.h"
+#include "Math/UnrealMathUtility.h"
+
 
 void APuzzlePlatformMPlayerController::BeginPlay()
 {
     Super::BeginPlay();
+
+    //Get Unique Steam ID and print it to the console log!
+    UE_LOG(LogTemp, Warning, TEXT("Player ID: %s"), *UBPFL_Steam::GetSteamIDByString());
+
+    //Search Database for Unique ID
+
+    //If UniqueID Exists
+        //Load Data
+    //Else
+        //Store Unique ID
+        //Create Row
+        //Autopopulate with Standard Data
+        //Load Data
+
+        int RoundedDown = FMath::DivideAndRoundDown<int>(10, 5);
+
 }
 
 void APuzzlePlatformMPlayerController::OpenMenuFromController()
