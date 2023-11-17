@@ -14,12 +14,14 @@ public class PuzzlePlatformM : ModuleRules
 			"Engine", 
 			"InputCore", 
 			"HeadMountedDisplay", 
-			"EnhancedInput", 
-			"UMG", 
-			"OnlineSubsystem", 
+			"EnhancedInput", //Enhanced Input
+			"UMG", //Widgets
+			"OnlineSubsystem", //Null subsytem testing
 			"OnlineSubsystemSteam", //Provides Online SusbsystemSteam
 			"OnlineSubsystemUtils", //Provides utils to acquire Steam Id
-			"Steamworks" //Provides utils to acquire Steam Id
+			"Steamworks", //Provides utils to acquire Steam Id
+			"HTTP", //Query HTTP Requests
+			"Json" //Json manipulation
 		});
 	}
 }

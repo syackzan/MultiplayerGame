@@ -4,6 +4,7 @@
 #include "PuzzlePlatformMCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
+
 APuzzlePlatformMGameMode::APuzzlePlatformMGameMode()
 {
 	// set default pawn class to our Blueprinted character
