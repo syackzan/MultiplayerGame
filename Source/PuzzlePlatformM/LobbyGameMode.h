@@ -22,5 +22,9 @@ public:
 
 private:
 	int32 NumberOfPlayers = 0;
+
+	void StartMatchAfterTimer();
 	
+	//Set up an FTimerHandle
+    FTimerHandle StartGameTimer;
 };

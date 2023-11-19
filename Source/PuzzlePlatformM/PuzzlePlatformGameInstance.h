@@ -40,6 +40,8 @@ public:
 
 	void PrintSessions();
 
+	void StartSession();
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -60,6 +62,8 @@ private:
 	void OnFindSessionComplete(bool Success);
 
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	void OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString);
 
 	IOnlineSessionPtr SessionInterface;
 

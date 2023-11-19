@@ -9,9 +9,10 @@
 #include "InGameMenu.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
+#include "UObject/UnrealNames.h"
 
 
-const static FName SESSION_NAME = TEXT("My Session Game");
+const static FName SESSION_NAME = NAME_GameSession;
 const static FName SERVER_NAME_SETTINGS = TEXT("ServerName");
 
 UPuzzlePlatformGameInstance::UPuzzlePlatformGameInstance(const FObjectInitializer &ObjectInitializer)
@@ -45,6 +46,11 @@ void UPuzzlePlatformGameInstance::Init()
     } else {
         UE_LOG(LogTemp, Warning, TEXT("No Subsystem found"));
     }
+
+    if(!GEngine) return;
+
+    //Engine handles network failure
+    GEngine->OnNetworkFailure().AddUObject(this, &UPuzzlePlatformGameInstance::OnNetworkFailure);
 };
 
 void UPuzzlePlatformGameInstance::Host(FString ServerName)
@@ -78,7 +84,7 @@ void UPuzzlePlatformGameInstance::CreateSessionThis()
         } else {
             SessionSettings.bIsLANMatch = false; //Steam Setting
         };
-        SessionSettings.NumPublicConnections = 2;
+        SessionSettings.NumPublicConnections = 5;
         SessionSettings.bShouldAdvertise = true;
         SessionSettings.bUsesPresence = true; //Steam Setting (Not required for LAN)
         SessionSettings.bUseLobbiesIfAvailable = true; //Steam Setting v>4.27 (Not required for LAN)
@@ -166,6 +172,11 @@ void UPuzzlePlatformGameInstance::OnFindSessionComplete(bool Success)
         UE_LOG(LogTemp, Warning, TEXT("Find Session Complete"));
     }
 }
+
+void UPuzzlePlatformGameInstance::OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+    LeaveGame();
+};
 
 void UPuzzlePlatformGameInstance::PrintSessions()
 {
@@ -281,6 +292,14 @@ void UPuzzlePlatformGameInstance::LeaveGame()
     if (PlayerController)
     {
         PlayerController->ClientTravel("/Game/MainMenuLobby", ETravelType::TRAVEL_Absolute);
+    }
+}
+
+void UPuzzlePlatformGameInstance::StartSession()
+{
+    if(SessionInterface.IsValid())
+    {
+        SessionInterface->StartSession(SESSION_NAME);
     }
 }
 
