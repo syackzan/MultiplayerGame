@@ -77,6 +77,8 @@ void UPuzzlePlatformGameInstance::CreateSessionThis()
     {
         FOnlineSessionSettings SessionSettings;
 
+        UE_LOG(LogTemp, Warning, TEXT("OnlinSubsystem: "), *IOnlineSubsystem::Get()->GetSubsystemName().ToString());
+
         //Subsystem will switch between STEAM and NULL - NULL is for testing purposes and requires a LAN connection
         if(IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
         {
