@@ -64,6 +64,9 @@ private:
 	class UButton* StartServer;
 
 	UPROPERTY(meta = (BindWidget))
+	class UEditableText* UserName;
+
+	UPROPERTY(meta = (BindWidget))
 	class UEditableText* UserServerNameText;
 
 	UPROPERTY(meta = (BindWidget))

@@ -84,7 +84,7 @@ void UMainMenu::SetUp()
 
     if (PuzzleMeTuzzles)
     {
-        UE_LOG(LogTemp, Warning, TEXT("PuzzlePlatformController Exists in Game Instance of main menu widget"));
+        UE_LOG(LogTemp, Warning, TEXT("PuzzlePlatformController Exists in Game Instance of Main Lobby widget"));
     }
 
     FInputModeUIOnly InputModeData;

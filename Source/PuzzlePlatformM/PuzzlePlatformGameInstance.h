@@ -32,6 +32,9 @@ public:
 	UFUNCTION(Exec, BlueprintCallable) 
 	void LoadMenu();
 
+	UFUNCTION(Exec, BlueprintCallable) 
+	void LoadMovieLobbyMenu();
+
 	UFUNCTION(BlueprintCallable)
 	void SetInGameMenuWidgetInterface();
 
@@ -42,10 +45,16 @@ public:
 
 	void StartSession();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UMovieLobbyMenu* MovieLobbyWidget;
+
 private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UMainMenu> MainMenuWidgetClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UMovieLobbyMenu> MovieLobbyMenuWidgetClass;
 
 	UPROPERTY()
 	class UMainMenu* MainMenuWidget;

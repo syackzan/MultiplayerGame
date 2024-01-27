@@ -5,11 +5,13 @@
 #include "Blueprint/UserWidget.h"
 #include "MenuInterface.h"
 #include "MainMenu.h"
+#include "MovieLobbyMenu.h"
 #include "PuzzlePlatformMPlayerController.h"
 #include "InGameMenu.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "UObject/UnrealNames.h"
+#include "MovieLobbyGameMode.h"
 
 
 const static FName SESSION_NAME = NAME_GameSession;
@@ -262,6 +264,28 @@ void UPuzzlePlatformGameInstance::LoadMenu()
         UE_LOG(LogTemp, Warning, TEXT("We Live"));
         MainMenuWidget->SetUp();
         MainMenuWidget->SetMenuInterface(this);
+    }
+}
+
+void UPuzzlePlatformGameInstance::LoadMovieLobbyMenu()
+{
+
+    if (MovieLobbyMenuWidgetClass)
+    {
+        MovieLobbyWidget = CreateWidget<UMovieLobbyMenu>(this, MovieLobbyMenuWidgetClass);
+
+        // if errors look to caste first!
+        if (MovieLobbyWidget == nullptr)
+        {
+            UE_LOG(LogTemp, Error, TEXT("Move lobby widget does not exist!"));
+            return;
+        } else 
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Movie lobby widget exists"));
+
+            MovieLobbyWidget->SetUp();
+            MovieLobbyWidget->SetMenuInterface(this);
+        }
     }
 }
 
